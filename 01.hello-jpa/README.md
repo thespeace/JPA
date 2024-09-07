@@ -1,5 +1,6 @@
-![JPA operation method](/img/JPA%20operation%20method.PNG)
+## 목표 : JPA 동작 확인
 
+![JPA operation method](./img/JPA%20operation%20method.PNG)
 
 ### 주의
 * ***엔티티 매니저 팩토리***는 하나만 생성해서 애플리케이션 전체에서 공유
