@@ -1,9 +1,8 @@
 package hellojpa;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.Date;
 
 /**
  * <pre>{@code
@@ -21,8 +20,25 @@ public class Member {
     @Id //DB PK와 매핑
     private Long id;
 
-    @Column(name = "name") // 컬럼명도 지정하여 매핑 가능
+    @Column(name = "username") // 컬럼명도 지정하여 매핑 가능
     private String name;
+
+    private Integer age;
+
+    @Enumerated(EnumType.STRING)
+    private RoleType roleType;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModifiedDate;
+
+    @Lob
+    private String description;
+
+    public Member() {
+    }
 
     public Long getId() {
         return id;
