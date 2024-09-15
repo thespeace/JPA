@@ -99,3 +99,81 @@ RDBMS에 초점을 맞춰서 설계하는 방식이 아니라 객체에 맞춰 �
   * **_테이블은 외래 키로 조인_** 을 사용해서 연관된 테이블을 찾는다.
   * **_객체는 참조_** 를 사용해서 연관된 객체를 찾는다.
   * 테이블과 객체 사이에는 이런 큰 간격이 있다.
+
+<br>
+
+---
+
+## 단방향 연관관계
+
+* ### 객체 지향 모델링(객체 연관관계 사용)
+  ![One-way modeling](../../img/One-way%20modeling.PNG)
+  
+<br>
+
+* ### 객체의 참조와 테이블의 외래 키를 매핑.
+  ```java
+  @Entity
+  public class Member {
+  
+      @Id @GeneratedValue
+      private Long id;
+  
+      @Column(name = "USERNAME")
+      private String name;
+      private int age;
+  
+      // @Column(name = "TEAM_ID")
+      // private Long teamId;
+  
+      @ManyToOne
+      @JoinColumn(name = "TEAM_ID")
+      private Team team;
+  
+      ...
+  ```
+  
+<br>
+
+* ### ORM 매핑  
+  ![One-way ORM mapping](../../img/One-way%20ORM%20mapping.PNG)
+
+<br>
+
+* ### 연관관계 저장
+  ```java
+  //팀 저장
+  Team team = new Team();
+  team.setName("TeamA");
+  em.persist(team);
+
+  //회원 저장
+  Member member = new Member();
+  member.setName("member1");
+  member.setTeam(team); //단방향 연관관계 설정, 참조 저장(jpa가 team에서 pk값을 꺼내 사용)
+  em.persist(member);
+  ```
+  
+<br>
+
+* ### 참조로 연관관계 조회(객체 그래프 탐색)
+  ```java
+  //조회
+  Member findMember = em.find(Member.class, member.getId());
+
+  //참조를 사용해서 연관관계 조회
+  Team findTeam = findMember.getTeam();
+  ```
+  
+<br>
+
+* ### 연관관계 수정
+  ```java
+  // 새로운 팀B
+  Team teamB = new Team();
+  teamB.setName("TeamB");
+  em.persist(teamB);
+  
+  // 회원1에 새로운 팀B 설정(외래키 변경)
+  member.setTeam(teamB);
+  ```
