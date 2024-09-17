@@ -292,5 +292,82 @@ RDBMS에 초점을 맞춰서 설계하는 방식이 아니라 객체에 맞춰 �
 ### 누구를 주인으로 지정해야 할까?
 * 외래 키가 있는 곳을 주인으로 정해라!(가이드)
   * 외래 키를 가진 테이블과 매핑되는 엔티티가 외래 키를 관리하는 것이 다방면으로 효율적이다.
-* 우리의 예시에서는 ```Member.team```이 연관관계의 주인
+* 우리의 예시에서는 ```Member.team```이 연관관계의 주인  
   ![Master of association](../../img/Master%20of%20association.PNG)
+
+<br>
+
+### 양방향 매핑시 가장 많이 하는 실수
+연관관계의 주인에 값을 입력하지 않음
+  ```java
+  Team team = new Team();
+  team.setName("TeamA");
+  em.persist(team);
+  
+  Member member = new Member();
+  member.setName("member1");
+  
+  //역방향(주인이 아닌 방향)만 연관관계 설정
+  team.getMembers().add(member);
+  
+  em.persist(member);
+  ```
+
+<br>
+
+### 양방향 매핑시 연관관계의 주인에 값을 입력해야 한다.
+순수한 객체 관계를 고려하면 항상 양쪽다 값을 입력해야 한다.
+
+  ```java
+  Team team = new Team();
+  team.setName("TeamA");
+  em.persist(team);
+  
+  Member member = new Member();
+  member.setName("member1");
+  
+  team.getMembers().add(member);
+  //연관관계의 주인에 값 설정
+  member.setTeam(team);
+  
+  em.persist(member);
+  ```
+
+<br>
+
+### 양방향 연관관계 주의 사항
+* **_"순수 객체 상태를 고려해서 항상 양쪽에 값을 설정하자"_**
+* 연관관계 편의 메소드를 생성하자
+  ```java
+  /** 
+   *  Member.java || Team.java
+   *  연관관계 객체 중 하나에 해당 메서드(연관관계 편의 메서드)를 원자적으로 사용해서
+   *  연관관계가 걸려있는 양쪽의 값을 설정하는 메서드를 작성하여 사용할 수도 있다.
+   *  사용한다면 둘 중에 하나에만 작성하자. 무한루프와 여러 오류를 발생시킬 수도 있음.
+   *  getter setter 관례로 인해 메서드 이름을 변경. (setTeam -> changeTeam)
+   **/
+  public void changeTeam(Team team) {
+      this.team = team;
+      team.getMembers().add(this);
+  }
+  ```
+* 양방향 매핑시에 무한 루프를 조심하자
+  * ex) toString(), lombok
+  * ex) JSON 생성 라이브러리
+    * 1.무한루프
+    * 2.API 스펙 변경
+    * 해당 문제를 해결하기 위해서는 controller에서 값 반환시 Entity 자체를 반환하지 말고 DTO(단순하게 값만 있는)로 변환해서 반환하면 해당 문제는 해결된다.
+
+<br>
+
+### 양방향 매핑 정리
+* **_단방향 매핑만으로도 이미 연관관계 매핑은 완료가 된 것._**
+* 양방향 매핑은 반대 방향으로 조회(객체 그래프 탐색) 기능이 추가 된 것 뿐이다.
+* 설계 관점에서보면 객체 입장에서 양방향 매핑은 장점이 하나도 없다. 이미 단방향 매핑만으로도 이미 설계가 끝이 난 것인데, 그렇다면 양방향 매핑은 왜 필요한 것이냐면 막상 실무에서 JPA를 사용하다보면 역방향으로 탐색할 일이 많아 진다.(+JPQL) 그렇기에 필요한 것이다.
+* 단방향 매핑을 잘 해놓으면 양방향은 필요할 때 추가해도 된다.(테이블에 영향을 주지 않음)
+
+<br>
+
+### 연관관계의 주인을 정하는 기준
+* 비즈니스 로직을 기준으로 연관관계의 주인을 선택하면 안된다.
+* **_연관관계의 주인은 외래 키의 위치를 기준으로 정해야 한다._**
