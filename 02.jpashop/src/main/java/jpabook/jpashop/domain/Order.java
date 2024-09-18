@@ -3,6 +3,8 @@ package jpabook.jpashop.domain;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "ORDERS")
@@ -12,13 +14,28 @@ public class Order {
     @Column(name = "ORDER_ID")
     private Long id;
 
-    @Column(name = "MEMBER_ID")
-    private Long memberId;
+//    @Column(name = "MEMBER_ID")
+//    private Long memberId;
+
+    //연관관계 매핑 추가(단반향 먼저, 양방향은 추후에 필요시 매핑(복잡도 증가))
+    //비즈니스상 잘못된 코드, 예시를 위해 추가.
+    @ManyToOne
+    @JoinColumn(name = "MEMBER_ID")
+    private Member member;
 
     private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderItem> orderItems = new ArrayList<>();
+
+    //연관 관계 편의 메서드(양방향 연관관계이기 때문에-)
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
 
     public Long getId() {
         return id;
@@ -28,12 +45,12 @@ public class Order {
         this.id = id;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    public Member getMember() {
+        return member;
     }
 
-    public void setMemberId(Long memberId) {
-        this.memberId = memberId;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
     public LocalDateTime getOrderDate() {
@@ -51,4 +68,5 @@ public class Order {
     public void setStatus(OrderStatus status) {
         this.status = status;
     }
+
 }

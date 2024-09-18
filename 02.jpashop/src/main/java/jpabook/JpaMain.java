@@ -4,6 +4,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
+import jpabook.jpashop.domain.Order;
+import jpabook.jpashop.domain.OrderItem;
 
 import java.util.List;
 
@@ -17,6 +19,11 @@ public class JpaMain {
         tx.begin();
 
         try {
+            //====양방향 연관관계 예시를 위해 추가====
+            Order order = new Order();
+            order.addOrderItem(new OrderItem());
+            //===================================
+
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
