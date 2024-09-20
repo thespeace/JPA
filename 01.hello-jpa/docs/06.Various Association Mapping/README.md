@@ -65,3 +65,56 @@
 ### 다대일 양방향 정리
 * 외래 키가 있는 쪽이 연관관계의 주인이다.
 * 양쪽을 서로 참조하도록 개발한다는 의미이다.
+
+<br>
+
+---
+
+## 일대다 [1:N]
+
+<br>
+
+### 일대다 단방향
+* 사실 표준 스펙에서 지원하기 때문에 설명하지만 실무에서는 거의 사용하지 않는다.
+  ![One-to-many one-way](../../img/One-to-many%20one-way.PNG)
+  
+<br>
+
+### 일대다 단방향 정리
+* 일대다 단방향은 일대다(1:N)에서 **_일(1)이 연관관계의 주인_**
+* 문제는 테이블 일대 다 관계는 항상 다(N) 쪽에 외래키가 있기 때문에, 객체와 테이블의 차이 때문에 반대편의 테이블의 외래키를 관리해야 하는 특이한 구조가 나오게 된다.(객체와 테이블의 패러다임 차이)
+* ```@JoinColumn```을 꼭 사용해야 한다. 그렇지 않으면 조인 테이블 방식을 사용한다.(중간에 테이블을 하나 추가)
+  ```java
+  @OneToMany
+  @JoinColumn(name = "TEAM_ID") // <- 주석처리하면 중간에 테이블(JoinTable)이 하나 생성되어 조인테이블 전략으로 바뀐다.
+  private List<Member> members = new ArrayList<>();
+  ```
+* 일대다 단반향 매핑의 단점
+  * 엔티티가 관리하는 외래 키가 다른 테이블에 있기 때문에, 연관관계 관리를 위해 추가로 UPDATE SQL 실행한다.
+* 일대다 단방향 매핑보다는 **_다대일 양방향 매핑을 사용_** 하자.
+
+<br>
+
+### 일대다 양방향
+* 해당 매핑은 공식적으로는 존재하지만 아래와 같이 사용가능하다.
+  ```java
+  @Entity
+  public class Team {
+  
+      //연관관계의 주인
+      @OneToMany
+      @JoinColumn(name = "TEAM_ID")
+      private List<Member> members = new ArrayList<>();
+  }
+  
+  @Entity
+  public class Member {
+  
+      //읽기 전용
+      @ManyToOne
+      @JoinColumn(name = "TEAM_ID", insertable=false, updatable=false)
+      private Team team;
+  }
+  ```
+* **_읽기 전용 필드_** 를 사용해서 양방향 처럼 사용하는 전략은 가끔 실무에서 필요할 때가 있다.
+* **_일대다 단방향 보다는 다대일 양방향을 사용하자._**
