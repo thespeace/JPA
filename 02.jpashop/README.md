@@ -66,3 +66,26 @@
 ## 객체 구조
 * 참조를 사용하도록 변경.  
   ![Start association-object structure](./img/Start%20association-object%20structure.PNG)
+
+<br>
+
+---
+
+# 실전 예제 - 3. 다양한 연관관계 매핑
+
+<br>
+
+## 배송, 카테고리 추가 - 엔티티
+* 주문과 배송은 1:1(```@OneToOne```)
+* 상품과 카테고리는 N:M(```@ManyToMany```)  
+  ![Shipping, Add Category - Entity](./img/Shipping,%20Add%20Category%20-%20Entity.PNG)
+
+<br>
+
+## 배송, 카테고리 추가 - ERD
+![Shipping, Add Category - ERD](./img/Shipping,%20Add%20Category%20-%20ERD.PNG)
+
+<br>
+
+## 배송, 카테고리 추가 - 엔티티 상세
+![Shipping, Add Category - Entity Details](./img/Shipping,%20Add%20Category%20-%20Entity%20Details.PNG)
