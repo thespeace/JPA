@@ -1,5 +1,6 @@
 package hellojpa;
 
+import hellojpa.advancedMapping.joinStrategy.Movie;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -14,8 +15,11 @@ public class JpaMain {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
 
-        //정석 코드
         try {
+
+            /**
+             * JPA 정석 코드
+             */
             //추가
             Member member = new Member();
             member.setId(1L);
@@ -36,13 +40,36 @@ public class JpaMain {
             em.remove(findMember);
 
 
-            //JPQL: 전체 회원 검색
+
+            /**
+             * JPQL: 전체 회원 검색
+             */
             List<Member> result = em.createQuery("select m from Member as m", Member.class)
                     .getResultList();
 
             for (Member m : result) {
                 System.out.println("m.getName() = " + m.getName());
             }
+
+
+
+            /**
+             * 상속 관계 매핑 예시
+             */
+            Movie movie = new Movie();
+            movie.setDirector("봉준호");
+            movie.setActor("송강호");
+            movie.setName("기생충");
+            movie.setPrice(18000);
+
+            em.persist(movie);
+
+            //영속성 컨텍스트 초기화.
+            em.flush();
+            em.clear();
+
+            Movie findMovie = em.find(Movie.class, movie.getId());
+            System.out.println("findMovie = " + findMovie);
 
             tx.commit();
         } catch (Exception e) {
