@@ -1,5 +1,6 @@
 package hellojpa;
 
+import hellojpa.mappedSuperclass.BaseEntity;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -15,7 +16,7 @@ import java.util.Date;
  */
 @Entity //JPA가 관리할 객체
 @Table(name = "Member") // default = class명 / table명이 다를 경우 지정하여 매핑 가능
-public class Member {
+public class Member extends BaseEntity {
 
     @Id //DB PK와 매핑
     private Long id;
