@@ -89,3 +89,30 @@
 
 ## 배송, 카테고리 추가 - 엔티티 상세
 ![Shipping, Add Category - Entity Details](./img/Shipping,%20Add%20Category%20-%20Entity%20Details.PNG)
+
+<br>
+
+---
+
+# 실전 예제 - 4. 상속관계 매핑
+
+<br>
+
+## 요구사항 추가
+* 상품의 종류는 음반, 도서, 영화가 있고 이후 더 확장될 수 있다.
+* 모든 데이터는 등록일과 수정일이 필수다.
+
+<br>
+
+## 도메인 모델
+  ![Inheritance relationship mapping - domain model](./img/Inheritance%20relationship%20mapping%20-%20domain%20model.PNG)
+  
+<br>
+
+## 도메인 모델 상세
+  ![Inheritance relationship mapping - domain model details](./img/Inheritance%20relationship%20mapping%20-%20domain%20model%20details.PNG)
+  
+<br>
+
+## 테이블 설계
+  ![Inheritance relationship mapping-table design](./img/Inheritance%20relationship%20mapping%20-%20table%20design.PNG)

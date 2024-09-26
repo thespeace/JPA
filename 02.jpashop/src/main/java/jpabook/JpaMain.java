@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
+import jpabook.jpashop.domain.Book;
 import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderItem;
 
@@ -22,6 +23,14 @@ public class JpaMain {
             //====양방향 연관관계 예시를 위해 추가====
             Order order = new Order();
             order.addOrderItem(new OrderItem());
+            //===================================
+
+            //=======실전예제 4, 요구사항 추가=======
+            Book book = new Book();
+            book.setName("JPA");
+            book.setAuthor("김영한");
+
+            em.persist(book);
             //===================================
 
             tx.commit();
