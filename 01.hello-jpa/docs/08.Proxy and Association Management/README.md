@@ -188,3 +188,91 @@
 ### 실무에서 프록시를 많이 사용할까?
 거의 안 쓴다.  
 하지만 이러한 프록시의 메커니즘을 이해해야 **_즉시 로딩_** 과 **_지연 로딩_** 에 대해서 깊이 있게 이해할 수가 있다.
+
+<br>
+
+---
+
+# 즉시 로딩과 지연 로딩
+
+<br>
+
+## 지연 로딩, LAZY을 사용해서 프록시로 조회
+* ### 예시) ```Member``` 객체를 90% 사용하고, ```Team```객체를 가끔 사용한다면?
+  ```java
+  @Entity
+   public class Member {
+      
+       @Id
+       @GeneratedValue
+       private Long id;
+       
+       @Column(name = "USERNAME")
+       private String name;
+       
+       @ManyToOne(fetch = FetchType.LAZY) //fetch 타입을 LAZY로 세팅하면 proxy로 가져온다.
+       @JoinColumn(name = "TEAM_ID")
+       private Team team;
+       
+       ...
+   }
+  ```
+  * ```@ManyToOne(fetch = FetchType.LAZY)```
+    ![Lazy loading](../../img/Lazy%20loading1.PNG)
+  
+  * ### 지연 로딩 LAZY를 사용해서 프록시로 조회
+    ![Lazy loading](../../img/Lazy%20loading2.PNG)
+
+<br>
+
+* ### 예시) 반대로 ```Member``` 객체와 ```Team``` 객체를 자주 함께 사용한다면?
+  * 즉시 로딩 EAGER를 사용해서 함께 조회
+    ```java
+    @Entity
+    public class Member {
+        @Id
+        @GeneratedValue
+        private Long id;
+    
+        @Column(name = "USERNAME")
+        private String name;
+    
+        @ManyToOne(fetch = FetchType.EAGER) //
+        @JoinColumn(name = "TEAM_ID")
+        private Team team;
+        
+        ...
+    }
+    ```
+  * ```@ManyToOne(fetch = FetchType.EAGER)```
+    ![Lazy loading](../../img/Lazy%20loading3.PNG)
+  * ### 즉시 로딩(EAGER), Member조회시 항상 Team도 조회
+    ![Lazy loading](../../img/Lazy%20loading4.PNG)
+
+<br>
+
+## 프록시와 즉시 로딩 주의
+* **_가급적 지연 로딩만 사용(특히 실무에서-)_**
+  * 테이블이 복잡하게 얽혀있는 상황에서는 쿼리가 엄청나게 방대해질 수 있기때문에 성능저하를 일으킨다.
+* 즉시 로딩을 적용하면 예상하지 못한 SQL이 발생한다.
+* **_즉시 로딩은 JPQL에서 N+1 문제를 일으킨다._**
+  * N+1? 결과가 10개면 N이 10이 되는 것으로 1은 최초 쿼리를 말한다. 즉, 쿼리를 하나 날렸는데 그것 때문에 추가 쿼리가 N개가 실행된다고 해서 N+1이라 한다.
+* ```@ManyToOne```, ```@OneToOne```은 **_기본이 즉시 로딩 -> LAZY로 설정_**
+* ```@OneToMany```, ```@ManyToMany```는 기본이 지연 로딩
+
+<br>
+
+## 지연 로딩 활용
+> 주의: 해당 예제는 이론을 보여주기 위한 예제로 실무에서는 지연 로딩만 사용하도록 하자.  
+* ```Member```와 ```Team```은 자주 함께 사용 -> 즉시 로딩
+* ``Member``와 ```Order```는 가끔 사용 -> 지연 로딩
+* ```Order```와 ```Product```는 자주 함께 사용 -> 즉시 로딩  
+  ![Example of using lazy loading](../../img/Example%20of%20using%20lazy%20loading1.PNG)  
+  ![Example of using lazy loading](../../img/Example%20of%20using%20lazy%20loading2.PNG)  
+  ![Example of using lazy loading](../../img/Example%20of%20using%20lazy%20loading3.PNG)
+
+<br>
+
+## 지연 로딩 활용 - 실무
+* ### **_실무에서 즉시 로딩을 사용하지 말고, 모든 연관관계에 지연 로딩을 사용해라!_**
+* **_즉시 로딩이 필요하다면 JPQL fetch 조인이나, 엔티티 그래프 기능을 사용해라!_**
