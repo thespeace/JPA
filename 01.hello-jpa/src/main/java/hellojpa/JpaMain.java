@@ -1,6 +1,8 @@
 package hellojpa;
 
 import hellojpa.advancedMapping.joinStrategy.Movie;
+import hellojpa.permanenceTransition.Child;
+import hellojpa.permanenceTransition.Parent;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -70,6 +72,29 @@ public class JpaMain {
 
             Movie findMovie = em.find(Movie.class, movie.getId());
             System.out.println("findMovie = " + findMovie);
+
+
+
+            /**
+             * 영속성 전이(CASCADE) 예시
+             */
+            Child child1 = new Child();
+            Child child2 = new Child();
+
+            Parent parent = new Parent();
+            parent.addChild(child1);
+            parent.addChild(child2);
+
+            em.persist(parent);
+//            em.persist(child1); //CASCADE 설정으로 인해 생략가능.
+//            em.persist(child2);
+
+            em.flush();
+            em.clear();
+
+            //orphanRemoval = true로 인해 해당 컬렉션에서 빠진 것은 삭제가 된다.
+            Parent findParent = em.find(Parent.class, parent.getId());
+            findParent.getChildList().remove(0);
 
             tx.commit();
         } catch (Exception e) {
