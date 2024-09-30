@@ -116,3 +116,21 @@
 
 ## 테이블 설계
   ![Inheritance relationship mapping-table design](./img/Inheritance%20relationship%20mapping%20-%20table%20design.PNG)
+
+<br>
+
+---
+
+# 실전 예제 - 5. 연관관계 관리
+
+<br>
+
+## 글로벌 FETCH 전략 설정
+* 모든 연관관계를 지연 로딩으로 설정.
+* ```@ManyToOne```, ```@OneToOne```은 기본이 즉시 로딩이므로 지연로딩으로 변경.
+
+<br>
+
+## 영속성 전이 설정
+* **_Order -> Delivery_** 를 영속성 전이 ALL 설정
+* **_Order -> OrderItem_** 을 영속성 전이 ALL 설정
