@@ -127,3 +127,93 @@
 
 ### 임베디드 타입과 null
 * 임베디드 타입의 값이 null이면 매핑한 컬럼 값은 모두 null이 된다.
+
+<br>
+
+## 값 타입과 불변 객체
+**_"값 타입은 복잡한 객체 세상을 조금이라도 단순화하려고 만든 개념이다.  
+따라서 값 타입은 단순하고 안전하게 다룰 수 있어야 한다"_**
+
+<br>
+
+### 값 타입 공유 참조
+* 임베디드 타입 같은 값 타입을 여러 엔티티에서 공유하면 위험하다.
+* 부작용(side effect) 발생
+  ![Embedded type](../../img/Embedded%20type%203.PNG)
+  ```java
+  Address address = new Address("city", "street", "10000");
+  
+  Member member1 = new Member();
+  member1.setUsername("member1");
+  member1.setHomeAddress(address);
+  em.persist(member1);
+  
+  Member member2 = new Member();
+  member2.setUsername("member2");
+  member2.setHomeAddress(address);
+  em.persist(member2);
+  
+  //member1의 city값만 변경되길 원했지만, member2의 city 값도 변경(사이드 이펙트 발생)
+  member.getHomeAddress().setCity("newCity");
+  ```
+
+<br>
+
+### 값 타입 복사
+* 값 타입의 실제 인스턴스인 값을 공유하는 것은 위험하다.
+* 대신 값(인스턴스)를 복사해서 사용해야 한다.
+  ![Embedded type](../../img/Embedded%20type%204.PNG)
+  ```java
+  Address address = new Address("city", "street", "10000");
+  
+  Member member1 = new Member();
+  member1.setUsername("member1");
+  member1.setHomeAddress(address);
+  em.persist(member1);
+  
+  Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
+  
+  Member member2 = new Member();
+  member2.setUsername("member2");
+  member2.setHomeAddress(copyAddress);
+  em.persist(member2);
+  
+  //값 타입을 공유하지 않고 복사해서 사용하니 의도대로 member1의 값만 변경되었다.
+  member.getHomeAddress().setCity("newCity");
+  ```
+  
+<br>
+
+### 객체 타입의 한계
+* 항상 값을 복사해서 사용하면 공유 참조로 인해 발생하는 부작용을 피할 수 있다.
+* 문제는 임베디드 타입처럼 **_직접 정의한 값 타입은 자바의 기본 타입이 아니라 객체 타입_** 이다.
+* 자바 기본 타입에 값을 대입하면 값을 복사한다.
+* **_객체 타입은 참조 값을 직접 대입하는 것을 막을 방법이 없다._**
+* **_객체의 공유 참조는 피할 수 없다._**
+  * 기본 타입(primitive type)
+    ```java
+    int a = 10;
+    int b = a; //기본 타입은 값을 복사
+    b = 4;
+    System.out.println(a); //10 
+    ```
+  * 객체 타입
+    ```java
+    Address a = new Address("Old");
+    Address b = a; //객체 타입은 참조를 전달
+    b.setCity("New");
+    System.out.println(b); //New
+    ```
+    
+<br>
+
+### 불변 객체
+* 객체 타입을 수정할 수 없게 만들면 **_부작용을 원천 차단_** 할 수 있다.
+* **_값 타입은 불변 객체(immutable object)로 설계해야 한다._**
+* **_불변 객체: 생성 시점 이후 절대 값을 변경할 수 없는 객체_**
+* 가장 쉬운 방법으로는 생성자로만 값을 설정하고 수정자(Setter)를 만들지 않으면 된다.
+* 만약 객체의 특정 값을 변경하고 싶다면, 객체를 통으로 다시 생성해서 바꾸면 된다.  
+  Value Object라는 것 자체가 값을 하나를 바꾸는 것보단 통을 바꿔끼는 게 맞는 개념이다.
+* 참고: ```Integer```, ```String```은 자바가 제공하는 대표적인 불변 객체
+
+### **_"불변이라는 작은 제약으로 부작용이라는 큰 재앙을 막을 수 있다"_**
