@@ -3,6 +3,9 @@ package hellojpa;
 import hellojpa.advancedMapping.joinStrategy.Movie;
 import hellojpa.permanenceTransition.Child;
 import hellojpa.permanenceTransition.Parent;
+import hellojpa.valueType.embedded.Address;
+import hellojpa.valueType.embedded.EmbeddedMember;
+import hellojpa.valueType.embedded.Period;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -95,6 +98,20 @@ public class JpaMain {
             //orphanRemoval = true로 인해 해당 컬렉션에서 빠진 것은 삭제가 된다.
             Parent findParent = em.find(Parent.class, parent.getId());
             findParent.getChildList().remove(0);
+
+
+
+            /**
+             * 임베디드 타입 사용 예시
+             */
+            EmbeddedMember embeMember = new EmbeddedMember();
+            embeMember.setUsername("hello");
+            embeMember.setHomeAddress(new Address("city", "street", "10000"));
+            embeMember.setWorkPeriod(new Period());
+
+            em.persist(embeMember);
+
+
 
             tx.commit();
         } catch (Exception e) {

@@ -60,3 +60,70 @@
     ```
 
 ### 위의 내용은 되게 기초적인 것이어서 굳이 인지하며 개발하지 않았지만, JPA에서는 매우 중요한 개념이다.
+
+
+<br>
+
+## 임베디드 타입(복합 값 타입)
+
+<br>
+
+### 임베디드(내장) 타입
+* 새로운 값 타입을 직접 정의할 수 있다.
+* JPA는 임베디드 타입(embedded type)이라 한다.
+* 주로 기본 값 타입을 모아서 만들어서 복합 값 타입이라고도 한다.
+* ```int```,```String```과 같은 값 타입(추적 X, 변경 O)
+
+
+* 예제)
+  * 회원 엔티티는 이름, 근무 시작일, 근무 종료일, 주소 도시, 주소 번지, 주소 우편번호를 가진다.  
+    ![Embedded type example](../../img/Embedded%20type%20example%201.PNG)
+    * 공통적인 속성들을 추상화해서 클래스 타입 묶는다. 이렇게 묶어 낼 수 있는 것을 임베디드 타입이라 한다.
+  * 회원 엔티티는 이름, 근무 기간, 집 주소를 가진다.  
+    ![Embedded type example](../../img/Embedded%20type%20example%202.PNG)  
+  * 최종적으로 멤버는 id, name, workPeriod, homeAddress의 4가지 속성을 가진다. 쉽게 이야기해서 기존 엔티티에서 속성 2개를 추출하여 클래스화한 것.  
+    ![Embedded type example](../../img/Embedded%20type%20example%203.PNG)
+
+<br>
+
+### 임베디드 타입 사용법
+* ```@Embeddable```: 값 타입을 정의하는 곳에 표시
+* ```@Embedded```: 값 타입을 사용하는 곳에 표시
+* 기본 생성자 필수
+
+<br>
+
+### 임베디드 타입의 장점
+* 재사용성
+* 높은 응집도
+* ```Period.isWork()```처럼 해당 값 타입만 사용하는 의미 있는 메소드를 만들 수 있다.
+* 임베디드 타입을 포함한 모든 값 타입은, 값 타입을 소유한 엔티티에 생명주기를 의존한다.
+
+<br>
+
+### 임베디드 타입과 테이블 매핑
+![Embedded type](../../img/Embedded%20type%201.PNG)
+* 임베디드 타입은 엔티티의 값일 뿐이다.
+* 임베디드 타입을 사용하기 전과 후에 **_매핑하는 테이블은 같다_**.
+* 객체와 테이블을 아주 세밀하게(find-grained) 매핑하는 것이 가능하다.(메소드 활용)
+* 잘 설계한 ORM 애플리케이션은 매핑한 테이블의 수보다 클래스의 수가 더 많다.
+* 예제) [EmbeddedMember.java](../../src/main/java/hellojpa/valueType/embedded/EmbeddedMember.java), [Address.java](../../src/main/java/hellojpa/valueType/embedded/Address.java), [Period.java](../../src/main/java/hellojpa/valueType/embedded/Period.java)
+
+<br>
+
+### 임베디드 타입과 연관관계
+* JPA 표준 스펙에 나와 있는 내용으로 임베디드 타입이 엔티티 값 타입을 가질 수 있다.
+
+![Embedded type](../../img/Embedded%20type%202.PNG)
+
+<br>
+
+### 한 엔티티에서 같은 값 타입을 사용하려면?
+* 컬렴 명이 중복되는 문제가 발생.  
+  ```@AttributeOverrides```, ```@AttributeOverride```를 사용해서 컬러 명 속성을 재정의해야 한다.
+* 예제) [EmbeddedMember.java](../../src/main/java/hellojpa/valueType/embedded/EmbeddedMember.java)
+
+<br>
+
+### 임베디드 타입과 null
+* 임베디드 타입의 값이 null이면 매핑한 컬럼 값은 모두 null이 된다.
