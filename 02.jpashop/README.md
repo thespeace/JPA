@@ -134,3 +134,11 @@
 ## 영속성 전이 설정
 * **_Order -> Delivery_** 를 영속성 전이 ALL 설정
 * **_Order -> OrderItem_** 을 영속성 전이 ALL 설정
+
+<br>
+
+---
+
+# 실전 예제 - 6. 값 타입 매핑
+
+![Value type mapping](./img/Value%20type%20mapping.PNG)
