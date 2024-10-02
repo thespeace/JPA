@@ -3,12 +3,14 @@ package hellojpa;
 import hellojpa.advancedMapping.joinStrategy.Movie;
 import hellojpa.permanenceTransition.Child;
 import hellojpa.permanenceTransition.Parent;
+import hellojpa.valueType.collection.CollectionMember;
 import hellojpa.valueType.embedded.Address;
 import hellojpa.valueType.embedded.EmbeddedMember;
 import hellojpa.valueType.embedded.Period;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Set;
 
 public class JpaMain {
 
@@ -110,6 +112,58 @@ public class JpaMain {
             embeMember.setWorkPeriod(new Period());
 
             em.persist(embeMember);
+
+
+
+            /**
+             * 값 타입 컬렉션 사용 예시
+             */
+            CollectionMember cMember = new CollectionMember();
+            cMember.setUsername("member1");
+            cMember.setHomeAddress(new Address("homeCity", "steet", "10000"));
+
+            cMember.getFavoriteFoods().add("치킨");
+            cMember.getFavoriteFoods().add("족발");
+            cMember.getFavoriteFoods().add("피자");
+
+            cMember.getAddressHistory().add(new Address("old1", "steet", "10000"));
+            cMember.getAddressHistory().add(new Address("old2", "steet", "10000"));
+
+            em.persist(cMember); //저장(영속성 전이 + 고아 객체 기능 필수)
+
+            em.flush();
+            em.clear();
+
+            System.out.println("=========== 조회 START ===========");
+            CollectionMember findCMember = em.find(CollectionMember.class, cMember.getId());
+
+            List<Address> addressHistory = findCMember.getAddressHistory();
+            for (Address address : addressHistory) {
+                System.out.println("address.getCity() = " + address.getCity()); //지연 로딩
+            }
+
+            Set<String> favoriteFoods = findCMember.getFavoriteFoods();
+            for (String favoriteFood : favoriteFoods) {
+                System.out.println("favoriteFood = " + favoriteFood); //지연 로딩
+            }
+
+            //수정: homeCity -> newCity
+//            findCMember.getHomeAddress().setCity("newCity"); //옳지 않은 방법, 사이드 이펙트 발생 가능.
+
+            //값 타입은 통째로 갈아 끼워야 한다.
+            Address old = findCMember.getHomeAddress();
+            findCMember.setHomeAddress(new Address("newCity", old.getStreet(), old.getZipcode()));
+
+            //치킨 -> 한식
+            findCMember.getFavoriteFoods().remove("치킨");
+            findCMember.getFavoriteFoods().add("한식");
+
+            //주소
+            System.out.println("=========== 주소 변경 ===========");
+            findCMember.getAddressHistory().remove(new Address("old1", "steet", "10000")); //equals()를 사용.
+            findCMember.getAddressHistory().add(new Address("newCity1", "steet", "10000"));
+            //의도한대로 수정이 되었지만, 쿼리가 old1 데이터를 삭제하고, newCity1 데이터를 삽입하는게 아니라-
+            //테이블 전체를 삭제한 후에 남아있어야할 데이터만 삽입하는 식으로 동작한다.(값 타입 컬렉션의 제약사항)
 
 
 
