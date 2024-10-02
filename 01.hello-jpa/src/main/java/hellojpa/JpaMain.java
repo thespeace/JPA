@@ -3,6 +3,7 @@ package hellojpa;
 import hellojpa.advancedMapping.joinStrategy.Movie;
 import hellojpa.permanenceTransition.Child;
 import hellojpa.permanenceTransition.Parent;
+import hellojpa.valueType.collection.AddressEntity;
 import hellojpa.valueType.collection.CollectionMember;
 import hellojpa.valueType.embedded.Address;
 import hellojpa.valueType.embedded.EmbeddedMember;
@@ -165,7 +166,11 @@ public class JpaMain {
             //의도한대로 수정이 되었지만, 쿼리가 old1 데이터를 삭제하고, newCity1 데이터를 삽입하는게 아니라-
             //테이블 전체를 삭제한 후에 남아있어야할 데이터만 삽입하는 식으로 동작한다.(값 타입 컬렉션의 제약사항)
 
+            //값 타입 -> 엔티티 승급 사용(실무에서 많이 사용)
+            cMember.getNewAddressHistory().add(new AddressEntity("newCity2", "steet", "10000"));
+            cMember.getNewAddressHistory().add(new AddressEntity("newCity3", "steet", "10000"));
 
+            em.persist(cMember);
 
             tx.commit();
         } catch (Exception e) {

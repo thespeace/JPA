@@ -34,6 +34,14 @@ public class CollectionMember {
     )
     private List<Address> addressHistory = new ArrayList<>();
 
+    /**
+     * <h2>값 타입 컬렉션 대안 예시</h2>
+     * 값 타입 컬렉션을 사용하는 것보다 활용도가 훨씬 높아진다. 또한 쿼리 최적화가 가능하다.
+     */
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "MEMBER_ID")
+    private List<AddressEntity> newAddressHistory = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -72,5 +80,13 @@ public class CollectionMember {
 
     public void setAddressHistory(List<Address> addressHistory) {
         this.addressHistory = addressHistory;
+    }
+
+    public List<AddressEntity> getNewAddressHistory() {
+        return newAddressHistory;
+    }
+
+    public void setNewAddressHistory(List<AddressEntity> newAddressHistory) {
+        this.newAddressHistory = newAddressHistory;
     }
 }
