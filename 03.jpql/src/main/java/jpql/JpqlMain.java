@@ -3,6 +3,7 @@ package jpql;
 import jakarta.persistence.*;
 import jpql.dto.MemberDTO;
 import jpql.entity.Member;
+import jpql.entity.Team;
 
 import java.util.List;
 
@@ -17,10 +18,17 @@ public class JpqlMain {
         tx.begin();
 
         try {
+
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
             for (int i = 0; i < 20; i++) {
                 Member member = new Member();
                 member.setUsername("member" + i);
                 member.setAge(i);
+                member.setTeam(team);
+
                 em.persist(member);
             }
 
@@ -89,6 +97,39 @@ public class JpqlMain {
             for (Member member1 : result3) {
                 System.out.println("member1 = " + member1);
             }
+
+
+
+            //조인 - 내부 조인
+            String query4 = "select m from Member m join m.team t";
+            List<Member> resultList4 = em.createQuery(query4, Member.class)
+                    .getResultList();
+            System.out.println("resultList4.size() = " + resultList4.size());
+
+            //조인 - 외부 조인
+            String query5 = "select m from Member m left join m.team t";
+            List<Member> resultList5 = em.createQuery(query5, Member.class)
+                    .getResultList();
+            System.out.println("resultList5.size() = " + resultList5.size());
+
+            //조인 - 세타 조인
+            String query6 = "select m from Member m, Team t where m.username = t.name";
+            List<Member> resultList6 = em.createQuery(query6, Member.class)
+                    .getResultList();
+            System.out.println("resultList6.size() = " + resultList6.size());
+
+            //조인(ON절을 이용) - 조인 대상 필터링
+            String query7 = "select m from Member m left join m.team t on t.name = 'teamA'";
+            List<Member> resultList7 = em.createQuery(query7, Member.class)
+                    .getResultList();
+            System.out.println("resultList7.size() = " + resultList7.size());
+
+            //조인(ON절을 이용) - 연관관계 없는 엔티티 외부 조인
+            String query8 = "select m from Member m left join Team t on m.username = t.name";
+            List<Member> resultList8 = em.createQuery(query8, Member.class)
+                    .getResultList();
+            System.out.println("resultList8.size() = " + resultList8.size());
+
 
 
             tx.commit();
