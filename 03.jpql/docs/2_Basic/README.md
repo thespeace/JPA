@@ -84,4 +84,30 @@ SELECT m FROM Member m where m.username=?1
 
 query.setParameter(1, usernameParam);
 ```
-* 위치 기반 파라미터 바인딩은 웬만하면 안쓰는 게 좋다. 작은 실수가 장애로 이어질 수 있다. 
+* 위치 기반 파라미터 바인딩은 웬만하면 안쓰는 게 좋다. 작은 실수가 장애로 이어질 수 있다.
+
+<br>
+
+---
+
+## 프로젝션
+* ```SELECT``` 절에 조회할 대상을 지정하는 것
+* 프로젝션 대상: 엔티티, 임베디드 타입, 스칼라 타입(숫자, 문자등 기본 데이터 타입)
+* ```SELECT m FROM Member m``` -> 엔티티 프로젝션(영속성 컨텍스트에서 다 관리된다)
+* ```SELECT m.team FROM Member m``` -> 엔티티 프로젝션
+* ```SELECT o.address FROM Order o``` -> 임베디드 타입 프로젝션
+* ```SELECT m.username, m.age FROM Member m``` -> 스칼라 타입 프로젝션
+* ```DISTINCT```로 중복 제거
+
+<br>
+
+### 프로젝션 - 여러 값 조회
+```SELECT m.username, m.age FROM Member m```
+1. Query 타입으로 조회
+2. Object[] 타입으로 조회
+3. new 명령어로 조회
+   * 단순 값을 DTO로 바로 조회  
+     ```SELECT new jpabook.jpql.UserDTO(m.username, m.age) FROM Member m```
+   * 패키지 명을 포함한 전체 클래스 명 입력
+   * 순서와 타입이 일치하는 생성자 필요
+

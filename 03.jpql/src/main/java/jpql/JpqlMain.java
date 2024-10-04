@@ -1,6 +1,7 @@
 package jpql;
 
 import jakarta.persistence.*;
+import jpql.dto.MemberDTO;
 import jpql.entity.Member;
 
 import java.util.List;
@@ -50,6 +51,30 @@ public class JpqlMain {
                     .setParameter(1, "member1")
                     .getSingleResult();
             System.out.println("singleResult3 = " + singleResult3.getUsername());
+
+
+
+            //프로젝션 - 여러 값, Query 타입으로 조회
+            List resultList1 = em.createQuery("select m.username, m.age from Member m")
+                    .getResultList();
+            Object o = resultList1.get(0);
+            Object[] result1 = (Object[]) o;
+            System.out.println("result1(username) = " + result1[0]);
+            System.out.println("result1(age) = " + result1[1]);
+
+            //프로젝션 - 여러 값, Query 타입으로 조회
+            List<Object[]> resultList2 = em.createQuery("select m.username, m.age from Member m")
+                    .getResultList();
+            Object[] result2 = resultList2.get(0);
+            System.out.println("result1(username) = " + result2[0]);
+            System.out.println("result1(age) = " + result2[1]);
+
+            //프로젝션 - 여러 값, new 명령어로 조회
+            List<MemberDTO> resultList3 = em.createQuery("select new jpql.dto.MemberDTO(m.username, m.age) from Member m", MemberDTO.class)
+                    .getResultList();
+            MemberDTO memberDTO = resultList3.get(0);
+            System.out.println("memberDTO.getUsername() = " + memberDTO.getUsername());
+            System.out.println("memberDTO.getAge() = " + memberDTO.getAge());
 
 
 
