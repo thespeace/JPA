@@ -111,3 +111,50 @@ query.setParameter(1, usernameParam);
    * 패키지 명을 포함한 전체 클래스 명 입력
    * 순서와 타입이 일치하는 생성자 필요
 
+<br>
+
+## 페이징 API
+* JPA는 페이징을 다음 두 API로 추상화
+  * ```setFirstResult(int startPosition)``` : 조회 시작 위치(0부터 시작)
+  * ```setMaxResults(int maxResult)``` : 조회할 데이터 수
+* 예시)
+  * ```java
+    //페이징 쿼리
+    String jpql = "select m from Member m order by m.name desc";
+    List<Member> resultList = em.createQuery(jpql, Member.class)
+            .setFirstResult(10)
+            .setMaxResults(20)
+            .getResultList();
+    ```
+* 인간의 머리로 추상적인 것들만 입력하면 구체적인 레벨을 프레임워크에서 해결해준다.
+* 위 예시 코드와 Direct 정보를 합쳐서 쿼리가 실행된다.  
+  예시)
+  * ```MYSQL``` 방언
+    * ```sql
+      SELECT
+        M.ID AS ID,
+        M.AGE AS AGE,
+        M.TEAM_ID AS TEAM_ID,
+        M.NAME AS NAME
+      FROM
+        MEMBER M
+      ORDER BY
+        M.NAME DESC LIMIT ?, ?
+      ```
+  * ```Oracle``` 방언
+    * ```sql
+      SELECT * FROM
+        ( SELECT ROW_.*, ROWNUM ROWNUM_
+        FROM
+            ( SELECT
+                M.ID AS ID,
+                M.AGE AS AGE,
+                M.TEAM_ID AS TEAM_ID,
+                M.NAME AS NAME
+            FROM MEMBER M
+            ORDER BY M.NAME
+            ) ROW_
+        WHERE ROWNUM <= ?
+        )
+      WHERE ROWNUM_ > ?
+      ```

@@ -17,10 +17,12 @@ public class JpqlMain {
         tx.begin();
 
         try {
-            Member member = new Member();
-            member.setUsername("member1");
-            member.setAge(10);
-            em.persist(member);
+            for (int i = 0; i < 20; i++) {
+                Member member = new Member();
+                member.setUsername("member" + i);
+                member.setAge(i);
+                em.persist(member);
+            }
 
             em.flush();
             em.clear();
@@ -76,6 +78,17 @@ public class JpqlMain {
             System.out.println("memberDTO.getUsername() = " + memberDTO.getUsername());
             System.out.println("memberDTO.getAge() = " + memberDTO.getAge());
 
+
+
+            //페이징 API
+            List<Member> result3 = em.createQuery("select m from Member m order by m.age desc", Member.class)
+                    .setFirstResult(0)
+                    .setMaxResults(10)
+                    .getResultList();
+            System.out.println("result1.size() = " + result3.size());
+            for (Member member1 : result3) {
+                System.out.println("member1 = " + member1);
+            }
 
 
             tx.commit();
