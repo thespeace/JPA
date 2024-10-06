@@ -231,3 +231,21 @@ query.setParameter(1, usernameParam);
   * **_조인으로 풀 수 있으면 풀어서 해결_**
   * 하이버네이트6 부터는 **_```FROM``` 절의 서브쿼리를 지원!_**
     * 참고 링크: https://in.relation.to/2022/06/24/hibernate-orm-61-features/
+
+<br>
+
+## JPQL 타입 표현
+* 문자: ‘HELLO’, ‘She’’s’
+* 숫자: 10L(Long), 10D(Double), 10F(Float)
+* Boolean: TRUE, FALSE
+* ENUM: jpabook.MemberType.Admin (패키지명 포함)
+* 엔티티 타입: TYPE(m) = Member (상속 관계에서 사용)
+
+<br>
+
+### JPQL 기타
+* SQL과 문법이 같다.
+* EXISTS, IN
+* AND, OR, NOT
+* =, >, >=, <, <=, <>
+* BETWEEN, LIKE, **_IS NULL_**

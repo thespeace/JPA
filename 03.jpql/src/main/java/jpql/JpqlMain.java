@@ -3,6 +3,7 @@ package jpql;
 import jakarta.persistence.*;
 import jpql.dto.MemberDTO;
 import jpql.entity.Member;
+import jpql.entity.MemberType;
 import jpql.entity.Team;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class JpqlMain {
                 member.setUsername("member" + i);
                 member.setAge(i);
                 member.setTeam(team);
+                member.setType(MemberType.USER);
 
                 em.persist(member);
             }
@@ -129,6 +131,20 @@ public class JpqlMain {
             List<Member> resultList8 = em.createQuery(query8, Member.class)
                     .getResultList();
             System.out.println("resultList8.size() = " + resultList8.size());
+
+
+
+            //JPQL 타입 표현 - ENUM
+            String query9 = "select m.username, 'HELLO', true from Member m" +
+                            "where m.type = :userType";
+            List<Object[]> resultList9 = em.createQuery(query9)
+                    .setParameter("userType", MemberType.USER)
+                    .getResultList();
+            for (Object[] objects : resultList9) {
+                System.out.println("objects[0] = " + objects[0]);
+                System.out.println("objects[1] = " + objects[1]);
+                System.out.println("objects[2] = " + objects[2]);
+            }
 
 
 
