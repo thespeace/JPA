@@ -135,7 +135,7 @@ public class JpqlMain {
 
 
             //JPQL 타입 표현 - ENUM
-            String query9 = "select m.username, 'HELLO', true from Member m" +
+            String query9 = "select m.username, 'HELLO', true from Member m " +
                             "where m.type = :userType";
             List<Object[]> resultList9 = em.createQuery(query9).setParameter("userType", MemberType.USER)
                     .getResultList();
