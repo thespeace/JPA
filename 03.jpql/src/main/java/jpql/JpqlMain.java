@@ -137,13 +137,28 @@ public class JpqlMain {
             //JPQL 타입 표현 - ENUM
             String query9 = "select m.username, 'HELLO', true from Member m" +
                             "where m.type = :userType";
-            List<Object[]> resultList9 = em.createQuery(query9)
-                    .setParameter("userType", MemberType.USER)
+            List<Object[]> resultList9 = em.createQuery(query9).setParameter("userType", MemberType.USER)
                     .getResultList();
             for (Object[] objects : resultList9) {
                 System.out.println("objects[0] = " + objects[0]);
                 System.out.println("objects[1] = " + objects[1]);
                 System.out.println("objects[2] = " + objects[2]);
+            }
+
+
+
+            //조건식 - CASE 식
+            String query10 =
+                    "select " +
+                            "case when m.age <= 10 then '학생요금' " +
+                            "     when m.age >= 60 then '경로요금' " +
+                            "     else '일반요금' " +
+                            "end " +
+                    "from Member m";
+            List<String> resultList10 = em.createQuery(query10, String.class)
+                    .getResultList();
+            for (String s : resultList10) {
+                System.out.println("s = " + s);
             }
 
 
