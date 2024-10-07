@@ -163,6 +163,16 @@ public class JpqlMain {
 
 
 
+            //JPQL 함수 - 사용자 정의 함수(FunctionContributer 구현체 사용)
+            String query11 = "select function('group_concat', m.username) From Member m";
+            List<String> resultList11 = em.createQuery(query11, String.class)
+                    .getResultList();
+            for (String s : resultList11) {
+                System.out.println("s = " + s);
+            }
+
+
+
             tx.commit();
         } catch (Exception e) {
             tx.rollback();

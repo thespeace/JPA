@@ -278,3 +278,27 @@ query.setParameter(1, usernameParam);
     ```select coalesce(m.username,'이름 없는 회원') from Member m```
   * 사용자 이름이 ‘관리자’면 null을 반환하고 나머지는 본인의 이름을 반환  
     ```select NULLIF(m.username, '관리자') from Member m```
+
+<br>
+
+## JPQL 기본 함수(표준 함수)
+* CONCAT : ```select concat('a', 'b') from Member m```
+* SUBSTRING: ```select substring(m.username, 2, 3) from Member m```
+* TRIM  
+* LOWER, UPPER  
+* LENGTH  
+* LOCATE: ```select locate('de','abcdegf') from Member m```
+* ABS, SQRT, MOD
+* JPA용 함수
+  * SIZE: 컬렉션의 크기  
+    ```select size(t.members) From Team t```
+  * INDEX: 컬렉션의 위치 값을 구할 때 사용(+```@OrderColumn``` 사용시)  
+    ```select index(t.members) From Team t```
+
+<br>
+
+### 사용자 정의 함수 호출
+* 하이버네이트는 사용전 방언에 추가해야 한다.
+  * 사용하는 DB 방언을 상속받고, 사용자 정의 함수를 등록한다.
+  * 표준 문법  
+    ```select function('group_concat', i.name) from Item i```
