@@ -89,3 +89,144 @@
 * 조인은 SQL 튜닝에 중요 포인트
 * 묵시적 조인은 조인이 일어나는 상황을 한눈에 파악하기 어렵다.
 
+<br>
+
+## JPQL - 페치 조인(fetch join)
+### **_실무에서 정말정말 중요하다._**
+
+<br>
+
+### 페치 조인(fetch join)
+* SQL 조인 종류가 아니고, JPQL에서 **_성능 최적화_** 를 위해 제공하는 기능이다.
+* 연관된 엔티티나 컬렉션을 **_SQL 한 번에 함께 조회_** 하는 기능(한방 쿼리)
+* ```join fetch``` 명령어 사용
+* 페치 조인 ::= ```[ LEFT [OUTER] | INNER ] JOIN FETCH 조인경로```
+* 지연 로딩으로 설정을 해도 페치 조인이 항상 우선이다.
+
+<br>
+
+### 엔티티 페치 조인
+* 회원을 조회하면서 연관된 팀도 함께 조회(SQL 한 번에)
+* JPQL:
+  ```sql
+  select m from Member m join fetch m.team
+  ```
+* SQL:
+  ```sql
+  SELECT M.*, T.* FROM MEMBER M 
+  INNER JOIN TEAM T ON M.TEAM_ID=T.ID
+  ```  
+  SQL을 보면 회원 뿐만 아니라 팀(```T.*```)도 함께 ```SELECT```
+
+<br>
+
+### 예시
+![Fetch join example](../../img/Fetch%20join%20example.PNG)
+
+<br>
+
+* 페치 조인 사용 전
+  ```java
+  String query = "select m From Member m";
+  List<Member> resultList = em.createQuery(query, Member.class).getResultList();
+  for (Member member : resultList) {
+      System.out.println("member = " + member.getUsername() + ", " + member.getTeam().getName());
+  }
+  // 회원1, 팀A(SQL)
+  // 회원2, 팀A(1차캐시)
+  // 회원3, 팀B(SQL)
+  
+  // 회원 100명 -> N + 1
+  // 쿼리가 N+1 수행, 성능 저하 발생
+  ```
+  
+<br>
+  
+* 패치 조인 사용 코드
+  ```java
+  String query = "select m From Member m join fetch m.team";
+  List<Member> resultList = em.createQuery(query, Member.class).getResultList();
+  for (Member member : resultList) {
+      //페치 조인으로 회원과 팀을 함께 조회해서 지연 로딩 X
+      System.out.println("member = " + member.getUsername() + ", " + member.getTeam().getName());
+  }
+  ```
+
+<br>
+
+### 컬렉션 페치 조인
+* 일대다 관계, 컬렉션 페치 조인
+* JPQL:  
+  ```sql
+  select t
+  from Team t join fetch t.members
+  where t.name = '팀A'
+  ```
+* SQL:
+  ```sql
+  SELECT T.*, M.*
+  FROM TEAM T
+  INNER JOIN MEMBER M ON T.ID=M.TEAM_ID
+  WHERE T.NAME = '팀A'
+  ```  
+   
+  ![Fetch join example](../../img/Fetch%20join%20example2.PNG)
+
+<br>
+
+### 페치 조인과 DISTINCT
+* SQL의 DISTINCT는 중복된 결과를 제거하는 명령
+* JPQL의 DISTINCT 2가지 기능 제공
+  1. SQL에 DISTINCT를 추가
+  2. 애플리케이션에서 엔티티 중복 제거
+* 예시  
+  ```sql
+  select distinct t
+  from Team t join fetch t.members
+  where t.name = ‘팀A’
+  ```
+  * SQL에 ```DISTINCT```를 추가하지만 데이터가 다르므로 SQL 결과에서 중복제거 실패  
+    ![Fetch join example](../../img/Fetch%20join%20example3.PNG)
+  * DISTINCT가 추가로 애플리케이션에서 중복 제거시도
+  * 같은 식별자를 가진 Team 엔티티 제거  
+    ![Fetch join example](../../img/Fetch%20join%20example4.PNG)
+  * DISTINCT 추가시 결과
+    ```
+    teamname = 팀A, team = Team@0x100
+    -> username = 회원1, member = Member@0x200
+    -> username = 회원2, member = Member@0x300
+    ```
+
+<br>
+
+### 하이버네이트6 변경 사항
+* DISTINCT가 추가로 애플리케이션에서 중복 제거시도
+  * -> 하이버네이트6 부터는 DISTINCT 명령어를 사용하지 않아도 애플리케이션에서 중복 제거가 자동으로 적용됩니다.
+* 참고 링크
+  * https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc#distinct
+
+<br>
+
+### 페치 조인과 일반 조인의 차이
+* 일반 조인 실행시 연관된 엔티티를 함께 조회하지 않는다.
+* JPQL:  
+  ```sql
+  select t
+  from Team t join t.members m
+  where t.name = ‘팀A'
+  ```
+* SQL:
+  ```sql
+  SELECT T.*
+  FROM TEAM T
+  INNER JOIN MEMBER M ON T.ID=M.TEAM_ID
+  WHERE T.NAME = '팀A'
+  ```
+
+* JPQL은 결과를 반환할 때 연관관계를 고려하지 않는다.
+* 단지 SELECT 절에 지정한 엔티티만 조회할 뿐
+* 위 쿼리에서는 TEAM 엔티티만 조회하고, MEMBER 엔티티는 조회하지 않는다.
+
+
+* 반대로 페치 조인을 사용할 때만 연관된 엔티티도 함께 조회한다.(즉시 로딩)
+* 페치 조인은 객체 그래프를 SQL 한번에 조회하는 개념이다.
