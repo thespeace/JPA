@@ -262,6 +262,21 @@ public class JpqlMain {
             }
 
 
+
+            //벌크 연산
+            int resultCount = em.createQuery("update Member m set m.age = 20")
+                    .executeUpdate();
+            System.out.println("resultCount = " + resultCount);
+
+            System.out.println("[영속성 컨텍스트 초기화 전]member1.getAge() = " + member1.getAge());
+
+            em.clear();
+            
+            Member findMember3 = em.find(Member.class, member1.getId());
+            System.out.println("[영속성 컨텍스트 초기화 후]findMember3.getAge() = " + findMember3.getAge());
+
+
+
             tx.commit();
         } catch (Exception e) {
             tx.rollback();

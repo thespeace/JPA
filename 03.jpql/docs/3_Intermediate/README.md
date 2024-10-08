@@ -419,3 +419,44 @@ List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.cl
 * Annotation보다 XML이 항상 우선권을 가진다.
 * 애플리케이션 운영 환경에 따라 다른 XML을 배포할 수 있다.
 * 사실 실무에서는 위 소개한 Named 쿼리말고 Spring Data JPA의 정적 쿼리 기능을 쓰는게 좋다.
+
+<br>
+
+## JPQL - 벌크 연산
+
+<br>
+
+### 벌크 연산
+* 쉽게 이야기 하자면 우리가 일반적으로 아는 SQL의 ```UPDATE```, ```DELETE```문이라고 보면 된다.
+* PK를 콕 찝어서 실행하는 ```UPDATE```와 ```DELETE```문 여러 개를 한번에 실행하는 것을 벌크 연산이라 한다.
+
+
+* 재고가 10개 미만인 모든 상품의 가격을 10% 상승하려면?
+  * JPA 변경 감지 기능으로 실행하려면 너무 많은 SQL 실행해야 한다.
+    1. 재고가 10개 미만인 상품을 리스트로 조회한다.
+    2. 상품 엔티티의 가격을 10% 증가한다.
+    3. 트랜잭션 커밋 시점에 변경감지가 동작한다.
+  * 변경된 데이터가 100건이라면 100번의 UPDATE SQL 실행..
+
+
+* 벌크 연산 쿼리 한 번으로 여러 테이블 로우 변경(엔티티)할 수 있다.
+* ```executeUpdate()```는 영향받은 엔티티 수 반환
+* ```UPDATE```, ```DELETE``` 지원
+* ```INSERT```도 가능, 표준 스펙엔 없지만 하이버네이트가 지원(```insert into .. select```)
+  ```java
+  String qlString = "update Product p " +
+                    "set p.price = p.price * 1.1 " +
+                    "where p.stockAmount < :stockAmount";
+  
+  int resultCount = em.createQuery(qlString).setParameter("stockAmount", 10)
+                      .executeUpdate(); 
+  ```
+  
+<br>
+
+### 벌크 연산 주의
+* 벌크 연산은 영속성 컨텍스트를 무시하고 데이터베이스에 직접 쿼리 실행
+* 데이터 정합성에 위배!  
+  해결책 두 가지
+  * 벌크 연산을 먼저 실행
+  * **_벌크 연산 수행 후 영속성 컨텍스트 초기화_**
