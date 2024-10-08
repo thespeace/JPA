@@ -235,6 +235,24 @@ public class JpqlMain {
 
 
 
+            //엔티티 직접 사용 - 기본 키 값
+            String query15 = "select m From Member m where m.id = :memberId";
+            Member findMember1 = em.createQuery(query15, Member.class)
+                    .setParameter("memberId", member3.getId())
+                    .getSingleResult();
+            System.out.println("findMember = " + findMember1);
+
+            //엔티티 직접 사용 - 외래 키 값
+            String query16 = "select m From Member m where m.team = :team";
+            List<Member> findMember2 = em.createQuery(query16, Member.class)
+                    .setParameter("team", teamA)
+                    .getResultList();
+            for (Member member : findMember2) {
+                System.out.println("member = " + member);
+            }
+
+
+
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
