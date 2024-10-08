@@ -3,6 +3,10 @@ package jpql.entity;
 import jakarta.persistence.*;
 
 @Entity
+@NamedQuery(
+        name = "Member.findByUsername",
+        query = "select m from Member m where m.username = :username"
+)//정적 쿼리
 public class Member {
 
     @Id @GeneratedValue

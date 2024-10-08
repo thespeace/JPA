@@ -253,6 +253,15 @@ public class JpqlMain {
 
 
 
+            //Named 쿼리 - 정적 쿼리
+            List<Member> resultList15 = em.createNamedQuery("Member.findByUsername", Member.class)
+                    .setParameter("username", "회원1")
+                    .getResultList();
+            for (Member member : resultList15) {
+                System.out.println("member = " + member);
+            }
+
+
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
