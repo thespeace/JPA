@@ -256,3 +256,47 @@
 * 페치 조인은 객체 그래프를 유지할 때 사용하면 효과적이다.
 * 여러 테이블을 조인해서 엔티티가 가진 모양이 아닌 전혀 다른 결과를 내야 하면, 페치 조인보다는 일반 조인을 사용하고 필요한 데이터들만 조회해서 DTO로 반환하는 것이 효과적이다.
 * **예전에는 쿼리를 고치면서 튜닝을 했지만 이제는 페치 조인을 잘 알아두면 실제 운영할 때 성능상의 큰 이점을 발휘할 수 있다!**
+
+<br>
+
+## JPQL - 다형성 쿼리
+
+<br>
+
+### 예시
+
+![polymorphic query](../../img/polymorphic%20query.PNG)
+
+* 다형적으로 설계, JPA가 특수한 기능을 제공한다.
+
+
+* ### TYPE
+  * 조회 대상을 특정 자식으로 한정
+  * 예) Item 중에 Book, Movie를 조회해라.
+  * JPQL
+    ```sql
+    select i from Item i
+    where type(i) IN (Book, Movie)
+    ```
+  * SQL
+    ```sql
+    select i from i
+    where i.DTYPE in (‘B’, ‘M’)
+    ```
+
+
+* ### TREAT(JPA 2.1)
+  * 자바의 타입 캐스팅과 유사, 상속 구조에서 부모 타입을 특정 자식 타입으로 다룰 때 사용한다.(다운 캐스팅처럼-)
+  * ```FROM```, ```WHERE```, ```SELECT```(하이버네이트 지원) 사용
+  * 예) 부모인 Item과 자식 Book이 있다.
+  * JPQL
+    ```sql
+    select i from Item i
+    where treat(i as Book).author = ‘kim’
+    ```
+  * SQL
+    ```sql
+    #싱글 테이블 전략시 해당 쿼리
+    select i.* from Item i
+    where i.DTYPE = ‘B’ and i.author = ‘kim’
+    ```
