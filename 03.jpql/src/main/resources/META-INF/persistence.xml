@@ -15,7 +15,9 @@
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments"  value="true"/>
+            <property name="hibernate.jdbc.batch_size" value="10" />
             <property name="hibernate.hbm2ddl.auto" value="create" />
+            <property name="hibernate.default_batch_fetch_size" value="100" /><!--1000이하의 값을 적절히 설정-->
         </properties>
     </persistence-unit>
 

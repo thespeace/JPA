@@ -218,6 +218,21 @@ public class JpqlMain {
                 }
             }
 
+            //페치 조인 페이징 사용
+            String query14= "select t From Team t";
+            List<Team> resultList14 = em.createQuery(query14, Team.class)
+                    .setFirstResult(0)
+                    .setMaxResults(2)
+                    .getResultList();
+            System.out.println("resultList14.size() = " + resultList14.size());
+
+            for (Team team1 : resultList14) {
+                System.out.println("team1.getName() = " + team1.getName() + "| members = " + team1.getMembers());
+                for (Member member : team1.getMembers()) {
+                    System.out.println("-> member = " + member);
+                }
+            }
+
 
 
             tx.commit();
